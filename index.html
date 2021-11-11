@@ -1,0 +1,277 @@
+<!-- File: index.html
+GUI Assignment: HW4 Using the jQuery Plugin/UI with Dynamic Multiplication Table
+     Create a dynamic table based on an HTML form using JavaScript
+Sofya Chow, Sofya_Chow@student.uml.edu
+Last Updated On: Nov 5, 2021    -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Multiplication Table</title>
+    <link href="style.css" rel="stylesheet">
+    <!-- The order of the scripts are important, CDN enables JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.9.2/themes/base/jquery-ui.css" />
+    <script src="js/myscript.js"></script>
+
+    <style>
+        body {
+            background: url(images/super_mario.jpeg) no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+        }
+
+        h {
+            font-family: monospace;
+            color: white;
+            font-size: 40px;
+            display: block;
+            text-align: center;
+            padding: 25px 50px 25px 50px;
+            border-bottom: 2px solid white;
+            border-bottom-width: 75%;
+            margin-bottom: 15px;
+        }
+
+        /* Header for the horizontal and vertical inputs */
+        p1 {
+            color: black;
+            font-family: monospace;
+            font-size: 17px;
+            text-align: center;
+            padding: 8px;
+            display: block;
+        }
+
+        /* Changes the container size of the input lines (including slider) */
+        .input_line {
+            margin: 0px 25px 0px 50px;
+        }
+
+        /* Lower bound / Upper bound */
+        p2 {
+            color: black;
+            font-family: monospace;
+            font-size: 18px;
+        }
+
+        /* Textfields */
+        input {
+            margin-left: 8px;
+            width: 30%;
+            height: 10%;
+            border-color: black;
+            border-style: solid;
+            border-radius: 8px;
+        }
+
+        /* Styles the text inside the textfields */
+        input[type="text"] {
+            color: black;
+            font-family: monospace;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        /* Clear other divs that might be affected by float left */
+        .divclear {
+            clear: left;
+        }
+
+        /* Form box */
+        #white-box {
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            width: 35%;
+            margin: 45px auto 50px 50px;
+            padding: 8px;
+            float: left;
+        }
+
+        #image {
+            border: 0;
+            width: 60px;
+            height: 70px;
+            display: block;
+        }
+
+        #multiplication_table {
+            background-color: white;
+            color: black;
+            border-radius: 10px;
+            margin: 45px auto 50px 50px;
+            padding: 8px;
+            float: left;
+            visibility: hidden;
+        }
+
+        td {
+            font-family: monospace;
+            font-size: 20px;
+            text-align: right;
+            margin: 0px;
+            width: 20px;
+        }
+
+        tr:nth-child(even) {
+            background-color: lightblue;
+        }
+
+        /* JQuery validator generates a label for each error message */
+        label.error {
+            color: red;
+            font-family: monospace;
+            font-size: 17px;
+            display: flex;
+            text-align: center;
+            padding: 8px;
+        }
+
+        /* Changes the background of the slider widget */
+        .slide {
+            margin-top: 8px;
+            background: rgba(250, 3, 129, 255);
+        }
+
+        .slide .ui-slider-handle {
+            background: white;
+            border-color: rgba(250, 3, 129, 255);
+            border-width: 2px;
+        }
+
+        /* Styling for the save table and remove tabs button */
+        .button_style {
+            background-color: white;
+            border: 3px solid rgb(250, 3, 129, 255);
+            color: black;
+            padding: 5px;
+            text-align: center;
+            font-size: 15px;
+            font-family: Monaco;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Helps center divs like display:block and centered */
+        .flex-center {
+            display: flex;
+            min-height: 0px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        #tabs {
+            border-radius: 10px;
+            overflow: auto;
+            visibility: hidden;
+        }
+
+        .ui-tabs .ui-tabs-nav {
+            background: transparent;
+            border: none;
+        }
+
+        .ui-tabs .ui-tabs-panel {
+            background: white;
+            border: none;
+            color: black;
+        }
+
+        /* Customizes the text color in the tabs */
+        .ui-state-default a,
+        .ui-state-default a:link,
+        .ui-state-default a:visited {
+            color: rgba(250, 3, 129, 255);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h> MULTIPLICATION TABLE</h>
+    <!-- Each input will have a unique id, so when passed, the js can retrieve its values -->
+    <div id="white-box">
+        <form id="form_id">
+            <p1>Enter horizontal axis bounding numbers:</p1>
+            <div class="input_line">
+                <!-- <div class="flex-center"> -->
+                <p2> Lower bound:</p2>
+                <input type='text' id="lower_horizontal" name="lower_horizontal" value="0"
+                    oninput="setNewInput('lower_hor')">
+                <!-- </div> -->
+                <div class="slide" id="slide_lower_hor"></div>
+            </div>
+            <br>
+            <div class="input_line">
+                <!-- <div class="flex-center"> -->
+                <p2> Upper bound:</p2>
+                <input type='text' id="upper_horizontal" name="upper_horizontal" value="0"
+                    oninput="setNewInput('upper_hor')">
+                <!-- </div> -->
+                <div class="slide" id="slide_upper_hor"></div>
+            </div>
+            <br>
+            <p1>Enter vertical axis bounding numbers:</p1>
+            <div class="input_line">
+                <!-- <div class="flex-center"> -->
+                <p2> Lower bound:</p2>
+                <input type='text' id="lower_vertical" name="lower_vertical" value="0"
+                    oninput="setNewInput('lower_ver')">
+                <!-- </div> -->
+                <div class="slide" id="slide_lower_ver"></div>
+            </div>
+            <br>
+            <div class="input_line">
+                <!-- <div class="flex-center"> -->
+                <p2> Upper bound:</p2>
+                <input type='text' id="upper_vertical" name="upper_vertical" value="0"
+                    oninput="setNewInput('upper_ver')">
+                <!-- </div> -->
+                <div class="slide" id="slide_upper_ver"></div>
+            </div>
+            <div id="error_message"></div>
+            <div class="flex-center">
+                <input type="image" id="image" alt="Go" src="images/arrow.png">
+            </div>
+            <div class="flex-center">
+                <button class="button_style" id="save_table_button" type="button">Save Table</button>
+            </div>
+            <!--This form div is for handling the tab section -->
+        </form>
+        <form id="tab_form_id">
+            <p1>Enter tab index(es) separated by commas to remove (zero-based):</p1>
+            <div class="input_line">
+                <div class="flex-center">
+                    <p2> e.g. 0,3:</p2>
+                    <input type='text' for="indexvalue" id="indexvalue">
+                </div>
+            </div>
+            <div class="flex-center">
+                <button class="button_style" id="remove_table_button" type="button">Remove Table</button>
+            </div>
+        </form>
+    </div>
+    <div>
+        <!-- Creating an empty/hidden table -->
+        <table id="multiplication_table"></table>
+    </div>
+    <!-- This creates space where the tabs will be generated -->
+    <div class="divclear">
+        <div id="tabs">
+            <ul>
+            </ul>
+        </div>
+    </div>
+</body>
+
+</html>

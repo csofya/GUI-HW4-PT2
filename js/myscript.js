@@ -319,13 +319,9 @@ $(function () {
         $('#tabs').tabs("refresh");
         $('#tabs').tabs("option", "active", -1); //makes the new tab active
 
-        insertTable();
+        // Insert content into the currently selected tab
+        var current_tab = $("#tabs").tabs('option', 'active');
+        current_tab += 1;
+        $("#tab-" + current_tab).append($("#multiplication_table").html());
     });
 });
-
-// Insert content into the currently selected tab
-function insertTable() {
-    var current_tab = $("#tabs").tabs('option', 'active');
-    current_tab += 1;
-    $("#tab-" + current_tab).append($("#multiplication_table").html());
-}
